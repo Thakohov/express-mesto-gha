@@ -32,7 +32,7 @@ const deleteCard = (req, res) => {
     }
 
     Card.findByIdAndDelete(req.params.cardId)
-      .then(() => res.send({ message: 'Карточка удалена' }))
+      .then(() => res.status(200).send({ message: 'Карточка удалена' }))
       .catch((err) => {
         if (err.name === 'CastError') {
           res.status(BAD_REQUEST).send({ message: 'Некорректный id карточки' });
