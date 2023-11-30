@@ -28,12 +28,18 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
+    .orFail(() => {
+      throw new Error('NotFound');
+    })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.message === 'NotFound') {
         res.status(NOT_FOUND).send({ message: 'Пользователь по данному id не найден' });
-      } else if (err.name === 'ValidationError') {
+        return;
+      }
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
+        return;
       }
       res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
@@ -46,11 +52,12 @@ const updateUser = (req, res) => {
   if (userId) {
     User.findByIdAndUpdate(userId, { name, about }, {
       new: true,
+      runValidators: true,
     })
       .then((user) => res.send({ data: user }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          res.status(BAD_REQUEST).send({ message: err.message });
+          res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
         } else {
           res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
         }
@@ -67,11 +74,12 @@ const updateAvatar = (req, res) => {
   if (userId) {
     User.findByIdAndUpdate(userId, { avatar }, {
       new: true,
+      runValidators: true,
     })
       .then((user) => res.send({ data: user }))
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          res.status(BAD_REQUEST).send({ message: err.message });
+          res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
         } else {
           res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
         }
