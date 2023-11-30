@@ -1,5 +1,9 @@
 const User = require('../models/user');
 
+const BAD_REQUEST = 400;
+const SERVER_ERROR = 500;
+const NOT_FOUND = 404;
+
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
@@ -7,9 +11,11 @@ const createUser = (req, res) => {
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new Error('Переданы неккоректные данные при создании пользовател');
+        res.status(BAD_REQUEST).send({ message: err.message });
+      } else {
+        res.status(NOT_FOUND).send({ message: 'Запрашиваемый пользователь не найден' });
       }
-      res.send({ message: err.message });
+      return res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
@@ -27,32 +33,44 @@ const getUserById = (req, res) => {
 
 const updateUser = (req, res) => {
   const { name, about } = req.body;
+  const userId = req.user._id;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, {
-    new: true,
-  })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new Error('Неккоректный id пользователя');
-      }
-      res.send({ message: err.message });
-    });
+  if (userId) {
+    User.findByIdAndUpdate(userId, { name, about }, {
+      new: true,
+    })
+      .then((user) => res.send({ data: user }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          res.status(BAD_REQUEST).send({ message: err.message });
+        } else {
+          res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
+        }
+      });
+  } else {
+    res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
+  }
 };
 
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
+  const userId = req.user._id;
 
-  User.findByIdAndUpdate(req.user._id, { avatar }, {
-    new: true,
-  })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new Error('Неккоректный id пользователя');
-      }
-      res.send({ message: err.message });
-    });
+  if (userId) {
+    User.findByIdAndUpdate(userId, { avatar }, {
+      new: true,
+    })
+      .then((user) => res.send({ data: user }))
+      .catch((err) => {
+        if (err.name === 'ValidationError') {
+          res.status(BAD_REQUEST).send({ message: err.message });
+        } else {
+          res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
+        }
+      });
+  } else {
+    res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
+  }
 };
 
 module.exports = {
