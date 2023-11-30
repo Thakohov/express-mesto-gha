@@ -1,8 +1,10 @@
 const User = require('../models/user');
 
-const BAD_REQUEST = 400;
-const SERVER_ERROR = 500;
-const NOT_FOUND = 404;
+const {
+  NOT_FOUND,
+  SERVER_ERROR,
+  BAD_REQUEST,
+} = require('../errors/errors');
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -11,9 +13,7 @@ const createUser = (req, res) => {
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: err.message });
-      } else {
-        res.status(NOT_FOUND).send({ message: 'Запрашиваемый пользователь не найден' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы неккоректные данные' });
       }
       return res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
@@ -22,13 +22,20 @@ const createUser = (req, res) => {
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send({ data: users }))
-    .catch((err) => res.send({ message: err.message }));
+    .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' }));
 };
 
 const getUserById = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => res.status(200).send({ data: user }))
-    .catch((err) => res.send({ message: err.message }));
+    .catch((err) => {
+      if (err.message === 'NotFound') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь по данному id не найден' });
+      } else if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
+      }
+      res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
+    });
 };
 
 const updateUser = (req, res) => {
