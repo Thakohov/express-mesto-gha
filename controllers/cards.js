@@ -1,9 +1,15 @@
 const Card = require('../models/card');
 
+const {
+  NOT_FOUND,
+  SERVER_ERROR,
+  BAD_REQUEST,
+} = require('../errors/errors');
+
 const getCards = (req, res) => {
   Card.find({})
     .then((card) => res.status(200).send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => res.status(SERVER_ERROR)).send({ message: 'Произошла ошибка на сервере' });
 };
 
 const createCard = (req, res) => {
@@ -13,25 +19,25 @@ const createCard = (req, res) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new Error('Карточка с указанным _id не найдена');
+        res.status(BAD_REQUEST).send({ message: 'Переданы неккоректные данные' });
       }
-      res.send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
 const deleteCard = (req, res) => {
   Card.findById(req.params.cardId).then((card) => {
     if (!card) {
-      throw new Error('Карточка с указанным _id не найдена');
+      res.status(NOT_FOUND).send({ message: 'Карточка с указанным _id не найдена' });
     }
 
     Card.findByIdAndDelete(req.params.cardId)
       .then(() => res.send({ message: 'Карточка удалена' }))
       .catch((err) => {
         if (err.name === 'CastError') {
-          throw new Error('Некорректный id карточки');
+          res.status(BAD_REQUEST).send({ message: 'Некорректный id карточки' });
         }
-        res.send({ message: err.message });
+        res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
       });
   });
 };
@@ -45,9 +51,9 @@ const likeCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error('Неккоректный id карточки');
+        res.status(BAD_REQUEST).send({ message: 'Некорректный id карточки' });
       }
-      res.send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
@@ -60,9 +66,9 @@ const dislikeCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new Error('Неккоректный id карточки');
+        res.status(BAD_REQUEST).send({ message: 'Некорректный id карточки' });
       }
-      res.send({ message: err.message });
+      res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
 };
 
