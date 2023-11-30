@@ -8,7 +8,7 @@ const {
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((card) => res.status(200).send({ data: card }))
+    .then((cards) => res.status(200).send({ data: cards }))
     .catch(() => res.status(SERVER_ERROR)).send({ message: 'Произошла ошибка на сервере' });
 };
 
@@ -20,6 +20,7 @@ const createCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы неккоректные данные' });
+        return;
       }
       res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
@@ -50,8 +51,14 @@ const likeCard = (req, res) => {
   )
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.message === 'NotFound') {
+        res.status(NOT_FOUND).send({ message: 'Передан несуществующий id' });
+        return;
+      }
+
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Некорректный id карточки' });
+        return;
       }
       res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' });
     });
