@@ -9,7 +9,7 @@ const {
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(() => res.status(SERVER_ERROR)).send({ message: 'Произошла ошибка на сервере' });
+    .catch(() => { res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' }); });
 };
 
 const createCard = (req, res) => {
