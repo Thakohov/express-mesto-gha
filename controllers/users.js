@@ -37,7 +37,7 @@ const getUserById = (req, res) => {
         res.status(NOT_FOUND).send({ message: 'Пользователь по данному id не найден' });
         return;
       }
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
         return;
       }

@@ -49,8 +49,12 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      console.log(card);
+      res.send({ data: card });
+    })
     .catch((err) => {
+      console.log(err);
       if (err.message === 'NotFound') {
         res.status(NOT_FOUND).send({ message: 'Передан несуществующий id' });
         return;
@@ -70,9 +74,13 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
+    .then((card) => {
+      console.log(card);
+      res.send({ data: card });
+    })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      console.log(err);
+      if (err.name === 'ValidationError') {
         res.status(BAD_REQUEST).send({ message: 'Некорректный id карточки' });
       }
       if (err.message === 'NotFound') {
