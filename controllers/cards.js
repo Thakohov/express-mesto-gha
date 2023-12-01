@@ -28,6 +28,7 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
+    .orFail(new Error('NotFound'))
     .then(() => res.status(200).send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err.message === 'NotFound') {
@@ -53,7 +54,6 @@ const likeCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      console.log(err);
       if (err.message === 'NotFound') {
         res.status(NOT_FOUND).send({ message: 'Передан несуществующий id' });
         return;
