@@ -3,8 +3,11 @@
 
 ## Используемые технологии:
 - Node.js
-- express
+- Express.js
 - ESlint
+- Mongoose
+- MongoDB
+- JavaScript
 
 ## Ссылка на проект:
 
