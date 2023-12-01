@@ -33,8 +33,8 @@ const getUserById = (req, res) => {
     })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.name === 'NotFound') {
-        res.status(BAD_REQUEST).send({ message: 'Пользователь по данному id не найден' });
+      if (err.message === 'NotFound') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь по данному id не найден' });
         return;
       }
       if (err.name === 'ValidationError') {
