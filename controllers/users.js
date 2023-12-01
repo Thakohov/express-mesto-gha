@@ -49,48 +49,47 @@ const updateUser = (req, res) => {
   const { name, about } = req.body;
   const userId = req.user._id;
 
-  if (userId) {
-    User.findByIdAndUpdate(userId, { name, about }, {
-      new: true,
-      runValidators: true,
-    })
-      .then((user) => res.send({ data: user }))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
-        }
+  User.findByIdAndUpdate(userId, { name, about }, {
+    new: true,
+    runValidators: true,
+  })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
+        return;
+      }
 
-        if (err.message === 'NotFound') {
-          res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
-        }
+      if (err.message === 'NotFound') {
+        res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
+        return;
+      }
 
-        res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
-      });
-  }
+      res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
+    });
 };
 
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
   const userId = req.user._id;
+  User.findByIdAndUpdate(userId, { avatar }, {
+    new: true,
+    runValidators: true,
+  })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
+        return;
+      }
 
-  if (userId) {
-    User.findByIdAndUpdate(userId, { avatar }, {
-      new: true,
-      runValidators: true,
-    })
-      .then((user) => res.send({ data: user }))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
-        }
+      if (err.message === 'NotFound') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь по данному id не найден' });
+        return;
+      }
 
-        if (err.message === 'NotFound') {
-          res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
-        }
-
-        res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
-      });
-  }
+      res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
+    });
 };
 
 module.exports = {
