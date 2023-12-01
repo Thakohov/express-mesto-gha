@@ -22,7 +22,7 @@ const createUser = (req, res) => {
 
 const getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send({ data: users }))
+    .then((users) => res.send({ data: users }))
     .catch(() => res.status(SERVER_ERROR).send({ message: 'Произошла ошибка на сервере' }));
 };
 
@@ -58,12 +58,14 @@ const updateUser = (req, res) => {
       .catch((err) => {
         if (err.name === 'ValidationError') {
           res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
-        } else {
+        }
+
+        if (err.message === 'NotFound') {
           res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
         }
+
+        res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
       });
-  } else {
-    res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
   }
 };
 
@@ -80,12 +82,14 @@ const updateAvatar = (req, res) => {
       .catch((err) => {
         if (err.name === 'ValidationError') {
           res.status(BAD_REQUEST).send({ message: 'Введены неккоректные данные' });
-        } else {
+        }
+
+        if (err.message === 'NotFound') {
           res.status(NOT_FOUND).send({ message: `Пользователь по id: ${userId} не найден` });
         }
+
+        res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
       });
-  } else {
-    res.status(SERVER_ERROR).send({ message: 'Прозошла ошибка на сервере' });
   }
 };
 
