@@ -10,4 +10,5 @@
 - JavaScript
 
 ## Ссылка на проект:
+https://github.com/Thakohov/express-mesto-gha.git
 
