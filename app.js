@@ -10,6 +10,7 @@ const app = express();
 mongoose.connect(DB_URL);
 
 app.use(express.json());
+// Hello
 app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
