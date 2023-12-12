@@ -32,6 +32,7 @@ const createUser = (req, res, next) => {
       email: user.email,
     }))
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ValidationError') {
         next(new BadRequest('Введены неккоректные данные'));
         return;

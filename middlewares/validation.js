@@ -26,7 +26,7 @@ const validateUserId = celebrate({
 });
 
 const validateUserAvatar = celebrate({
-  params: Joi.object().keys({
+  body: Joi.object().keys({
     avatar: Joi.string().regex(regex),
   }),
 });
