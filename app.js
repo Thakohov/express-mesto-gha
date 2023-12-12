@@ -1,30 +1,36 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const helmet = require('helmet');
+const { errors } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { NOT_FOUND } = require('./errors/errors');
+const { login, createUser } = require('./controllers/users');
+const handleError = require('./middlewares/HandleError');
+const auth = require('./middlewares/auth');
+const { validateCreateUser, validateLoginUser } = require('./middlewares/validation');
 
 const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const app = express();
 
-mongoose.connect(DB_URL);
+mongoose.connect(DB_URL).then(() => console.log('Mongoose connected'));
 
 app.use(express.json());
-// Hello
 app.use(express.urlencoded({ extended: true }));
+app.use(helmet());
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '6564caaffdf660cbf2b53ef2',
-  };
+app.post('/signin', validateLoginUser, login);
+app.post('/signup', validateCreateUser, createUser);
 
-  next();
-});
+app.use(auth);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+
 app.use('*', (req, res) => {
-  res.status(NOT_FOUND).send({ message: 'Ресурс не найден' });
+  res.status(404).send({ message: 'Ресурс не найден' });
 });
+
+app.use(errors());
+app.use(handleError);
 
 app.listen(PORT);
