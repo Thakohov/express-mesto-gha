@@ -24,14 +24,21 @@ const createUser = (req, res, next) => {
       about,
       avatar,
     }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(201).send({
+      _id: user._id,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      password: user.password,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequest('Введены неккоректные данные'));
         return;
       }
 
-      if (err.code === 11000) {
+      if (err.code === 11000 || err.name === 'MongoServerError') {
         next(new Conflict('Пользователь с таким email уже существует'));
         return;
       }
