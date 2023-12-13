@@ -6,7 +6,7 @@ const NoPermission = require('../errors/NoPermission');
 
 const getCards = (req, res, next) => {
   Card.find({})
-    .then((cards) => res.status(200).send({ data: cards }))
+    .then((cards) => res.send({ data: cards }))
     .catch(next);
 };
 
@@ -62,15 +62,11 @@ const likeCard = (req, res, next) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        next(new NotFound('Карточка по данному id не найдена'));
-        return;
-      }
-
       if (err.name === 'CastError') {
         next(new BadRequest('некорректный id карточки'));
         return;
       }
+
       next(err);
     });
 };
@@ -90,10 +86,6 @@ const dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new BadRequest('некорректный id карточки'));
-        return;
-      }
-      if (err.message === 'NotFound') {
-        next(new NotFound('Карточка по данному id не найдена'));
         return;
       }
 
