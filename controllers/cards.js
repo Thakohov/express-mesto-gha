@@ -17,16 +17,18 @@ const createCard = (req, res, next) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Введены неккоректные данные'));
+        next(new BadRequest('Переданы некорректные данные при создании карточки'));
         return;
       }
-      next();
+      next(err);
     });
 };
 
 const deleteCard = (req, res, next) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .orFail(new Error('NotFound'))
+    .orFail(() => {
+      next(new NotFound('Карточка по данному id не найдена'));
+    })
     .then((card) => {
       if (card.owner.toString() !== req.user._id) {
         next(new NoPermission('Нет прав на удаление чужой карточки'));
@@ -35,15 +37,15 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        next(new NotFound('Пользователь по данному id не найден'));
+        next(new NotFound('Карточка по данному id не найдена'));
         return;
       }
 
       if (err.name === 'CastError') {
-        next(new BadRequest('Введены неккоректные данные'));
+        next(new BadRequest('некорректный id карточки'));
         return;
       }
-      next();
+      next(err);
     });
 };
 
@@ -53,21 +55,23 @@ const likeCard = (req, res, next) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NotFound'))
+    .orFail(() => {
+      next(new NotFound('Карточка по данному id не найдена'));
+    })
     .then((card) => {
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.message === 'NotFound') {
-        next(new NotFound('Пользователь по данному id не найден'));
+        next(new NotFound('Карточка по данному id не найдена'));
         return;
       }
 
       if (err.name === 'CastError') {
-        next(new BadRequest('Введены неккоректные данные'));
+        next(new BadRequest('некорректный id карточки'));
         return;
       }
-      next();
+      next(err);
     });
 };
 
@@ -77,21 +81,23 @@ const dislikeCard = (req, res, next) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(new Error('NotFound'))
+    .orFail(() => {
+      next(new NotFound('Карточка по данному id не найдена'));
+    })
     .then((card) => {
       res.send({ data: card });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('Введены неккоректные данные'));
+        next(new BadRequest('некорректный id карточки'));
         return;
       }
       if (err.message === 'NotFound') {
-        next(new NotFound('Пользователь по данному id не найден'));
+        next(new NotFound('Карточка по данному id не найдена'));
         return;
       }
 
-      next();
+      next(err);
     });
 };
 

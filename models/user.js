@@ -3,9 +3,6 @@ const bcrypt = require('bcryptjs');
 const { isURL, isEmail } = require('validator');
 const Unauthorized = require('../errors/Unauthorized');
 
-const JWT_SECRET = 'secret key';
-module.exports = JWT_SECRET;
-
 const userSchema = new mongoose.Schema(
   {
     name: {

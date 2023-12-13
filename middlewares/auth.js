@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = 'zzzzzxxxxcccvvb';
+const SECRET_KEY = require('../config');
 const Unauthorized = require('../errors/Unauthorized');
 
 module.exports = (req, res, next) => {
@@ -9,6 +9,7 @@ module.exports = (req, res, next) => {
 
   if (!authorization || !authorization.startsWith(bearer)) {
     next(new Unauthorized('Необходима авторизация'));
+    return;
   }
 
   const token = authorization.replace(bearer, '');
@@ -17,7 +18,8 @@ module.exports = (req, res, next) => {
   try {
     payload = jwt.verify(token, SECRET_KEY);
   } catch (err) {
-    next(new Unauthorized('Необходима авторизация 2'));
+    next(new Unauthorized('Необходима авторизация'));
+    return;
   }
 
   req.user = payload;
