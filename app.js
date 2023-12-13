@@ -8,7 +8,7 @@ const { PORT, DB_URL } = require('./config');
 
 const app = express();
 
-mongoose.connect(DB_URL).then(() => console.log('Mongoose connected'));
+mongoose.connect(DB_URL);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

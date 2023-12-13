@@ -25,24 +25,24 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail(() => {
       next(new NotFound('Карточка по данному id не найдена'));
     })
     .then((card) => {
-      if (card.owner.toString() !== req.user._id) {
-        next(new NoPermission('Нет прав на удаление чужой карточки'));
+      if (!card) {
+        throw new NotFound('Карточка с указанным _id не найдена');
       }
-      res.status(200).send({ message: 'Карточка удалена' });
-    })
-    .catch((err) => {
-      if (err.message === 'NotFound') {
-        next(new NotFound('Карточка по данному id не найдена'));
+      if (card.owner.toString() !== req.user._id) {
+        next(new NoPermission('Нет прав на удаление чужой картчоки'));
         return;
       }
 
+      Card.findByIdAndDelete(req.params.cardId).then(() => res.send({ message: 'Карточка удалена' })).catch(next);
+    })
+    .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequest('некорректный id карточки'));
+        next(new BadRequest('Некорректный id карточки'));
         return;
       }
       next(err);
