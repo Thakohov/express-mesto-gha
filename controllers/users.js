@@ -36,7 +36,7 @@ const createUser = (req, res, next) => {
         return;
       }
 
-      if (err.code === 11000 || err.name === 'MongoServerError') {
+      if (err.code === 11000 && err.name === 'MongoServerError') {
         next(new Conflict('Пользователь с таким email уже существует'));
         return;
       }

@@ -5,7 +5,7 @@ const { errors } = require('celebrate');
 const handleError = require('./middlewares/HandleError');
 const router = require('./routes');
 const { PORT, DB_URL } = require('./config');
-
+// result
 const app = express();
 
 mongoose.connect(DB_URL);
